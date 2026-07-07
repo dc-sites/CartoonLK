@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CartoonLK - Watch Your Favorite Cartoons</title>
+<meta name="description" content="Watch cartoons online in Sinhala and English - CartoonLK" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-info">
+      <span><i class="fa-solid fa-tv"></i> <span data-i18n="topbar_new">New episodes daily</span></span>
+      <span class="hide-mobile"><i class="fa-solid fa-globe"></i> <span data-i18n="topbar_lang">English / සිංහල</span></span>
+    </div>
+    <div class="topbar-actions">
+      <button id="langToggle" class="lang-btn" title="Switch Language">
+        <i class="fa-solid fa-language"></i> <span id="langLabel">සිංහල</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Navbar -->
+<header class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo">
+      <i class="fa-solid fa-clapperboard"></i>
+      <span>Cartoon<span class="accent">LK</span></span>
+    </a>
+
+    <nav class="nav-menu" id="navMenu">
+      <ul class="nav-list">
+        <li><a href="index.html" class="active"><i class="fa-solid fa-house"></i> <span data-i18n="nav_home">Home</span></a></li>
+        <li class="has-dropdown">
+          <a href="#"><i class="fa-solid fa-layer-group"></i> <span data-i18n="nav_categories">Categories</span> <i class="fa-solid fa-chevron-down"></i></a>
+          <ul class="dropdown" id="categoryDropdown">
+            <li><a href="#"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</a></li>
+          </ul>
+        </li>
+        <li><a href="watchlater.html"><i class="fa-solid fa-bookmark"></i> <span data-i18n="nav_watchlater">Watch Later</span></a></li>
+        <li><a href="#about"><i class="fa-solid fa-circle-info"></i> <span data-i18n="nav_about">About</span></a></li>
+      </ul>
+    </nav>
+
+    <div class="nav-right">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search cartoons..." data-i18n-placeholder="search_placeholder">
+        <button id="searchBtn"><i class="fa-solid fa-magnifying-glass"></i></button>
+      </div>
+      <button class="hamburger" id="hamburger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="container hero-inner">
+    <div class="hero-content">
+      <span class="hero-badge"><i class="fa-solid fa-fire"></i> <span data-i18n="hero_badge">Trending Now</span></span>
+      <h1 data-i18n="hero_title">Watch Your Favorite Cartoons Anytime</h1>
+      <p data-i18n="hero_desc">Stream the best cartoons in Sinhala and English. New episodes added every day!</p>
+      <div class="hero-actions">
+        <a href="#latest" class="btn btn-primary"><i class="fa-solid fa-play"></i> <span data-i18n="hero_browse">Browse Now</span></a>
+        <a href="watchlater.html" class="btn btn-outline"><i class="fa-solid fa-bookmark"></i> <span data-i18n="hero_watchlater">My Watch Later</span></a>
+      </div>
+      <div class="hero-stats">
+        <div><i class="fa-solid fa-film"></i> <span id="statVideos">0</span> <span data-i18n="stat_videos">Videos</span></div>
+        <div><i class="fa-solid fa-users"></i> <span>10K+</span> <span data-i18n="stat_viewers">Viewers</span></div>
+        <div><i class="fa-solid fa-star"></i> <span>4.9</span> <span data-i18n="stat_rating">Rating</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Categories Pills -->
+<section class="container categories-pills">
+  <div class="pills-scroll" id="categoryPills">
+    <button class="pill active" data-cat="all"><i class="fa-solid fa-border-all"></i> <span data-i18n="pill_all">All</span></button>
+  </div>
+</section>
+
+<!-- Latest Videos -->
+<section class="container section" id="latest">
+  <div class="section-head">
+    <h2><i class="fa-solid fa-bolt"></i> <span data-i18n="latest_title">Latest Uploads</span></h2>
+    <a href="#" class="view-all"><span data-i18n="view_all">View All</span> <i class="fa-solid fa-arrow-right"></i></a>
+  </div>
+  <div class="video-grid" id="videoGrid">
+    <!-- Loader -->
+    <div class="loader-wrap"><div class="loader"></div></div>
+  </div>
+</section>
+
+<!-- Featured Categories -->
+<section class="container section" id="featuredCats">
+  <div class="section-head">
+    <h2><i class="fa-solid fa-layer-group"></i> <span data-i18n="feat_title">Browse by Category</span></h2>
+  </div>
+  <div class="cat-grid" id="catGrid"></div>
+</section>
+
+<!-- About -->
+<section class="container section" id="about">
+  <div class="about-card">
+    <div class="about-icon"><i class="fa-solid fa-circle-info"></i></div>
+    <h2 data-i18n="about_title">About CartoonLK</h2>
+    <p data-i18n="about_desc">CartoonLK is your ultimate destination for cartoon entertainment. We bring you the best animated content in both Sinhala and English, completely free. Enjoy high-quality streaming on any device, anytime.</p>
+    <div class="about-features">
+      <div><i class="fa-solid fa-bolt"></i><span data-i18n="about_f1">Fast Streaming</span></div>
+      <div><i class="fa-solid fa-mobile-screen"></i><span data-i18n="about_f2">Mobile Friendly</span></div>
+      <div><i class="fa-solid fa-language"></i><span data-i18n="about_f3">Multi Language</span></div>
+      <div><i class="fa-solid fa-shield-halved"></i><span data-i18n="about_f4">Safe & Secure</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-col">
+      <h3><i class="fa-solid fa-clapperboard"></i> CartoonLK</h3>
+      <p data-i18n="footer_desc">Your favorite cartoons in Sinhala and English.</p>
+      <div class="social">
+        <a href="#"><i class="fa-brands fa-facebook"></i></a>
+        <a href="#"><i class="fa-brands fa-youtube"></i></a>
+        <a href="#"><i class="fa-brands fa-telegram"></i></a>
+        <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer_links">Quick Links</h4>
+      <ul>
+        <li><a href="index.html"><i class="fa-solid fa-angle-right"></i> <span data-i18n="nav_home">Home</span></a></li>
+        <li><a href="watchlater.html"><i class="fa-solid fa-angle-right"></i> <span data-i18n="nav_watchlater">Watch Later</span></a></li>
+        <li><a href="#about"><i class="fa-solid fa-angle-right"></i> <span data-i18n="nav_about">About</span></a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer_categories">Categories</h4>
+      <ul id="footerCats"></ul>
+    </div>
+    <div class="footer-col">
+      <h4 data-i18n="footer_contact">Contact</h4>
+      <ul>
+        <li><i class="fa-solid fa-envelope"></i> info@cartoonlk.com</li>
+        <li><i class="fa-brands fa-telegram"></i> @CartoonLK</li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>&copy; 2026 CartoonLK. <span data-i18n="footer_rights">All Rights Reserved.</span></p>
+  </div>
+</footer>
+
+<!-- Back to top -->
+<button id="toTop" class="to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/translate.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

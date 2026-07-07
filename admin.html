@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin - CartoonLK</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body class="admin-body">
+
+<!-- Login Screen -->
+<div class="admin-login" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo"><i class="fa-solid fa-clapperboard"></i><span>Cartoon<span class="accent">LK</span></span></div>
+    <h2>Admin Login</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label><i class="fa-solid fa-user"></i> Username</label>
+        <input type="text" id="loginUser" required>
+      </div>
+      <div class="form-group">
+        <label><i class="fa-solid fa-lock"></i> Password</label>
+        <input type="password" id="loginPass" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+      <p class="login-hint">Default: admin / admin123</p>
+    </form>
+  </div>
+</div>
+
+<!-- Admin Dashboard -->
+<div class="admin-dashboard" id="dashboard" style="display:none;">
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-logo"><i class="fa-solid fa-clapperboard"></i><span>CartoonLK</span></div>
+    <nav class="sidebar-nav">
+      <a href="#" class="active" data-tab="videos"><i class="fa-solid fa-film"></i> <span>Videos</span></a>
+      <a href="#" data-tab="add"><i class="fa-solid fa-plus"></i> <span>Add Video</span></a>
+      <a href="#" data-tab="categories"><i class="fa-solid fa-layer-group"></i> <span>Categories</span></a>
+      <a href="#" data-tab="intro"><i class="fa-solid fa-clapperboard"></i> <span>Intro Video</span></a>
+      <a href="#" data-tab="settings"><i class="fa-solid fa-gear"></i> <span>Settings</span></a>
+      <a href="index.html" target="_blank"><i class="fa-solid fa-eye"></i> <span>View Site</span></a>
+      <a href="#" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span></a>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main class="admin-main">
+    <header class="admin-header">
+      <button class="sidebar-toggle" id="sidebarToggle"><i class="fa-solid fa-bars"></i></button>
+      <h2 id="adminTitle">Videos</h2>
+      <div class="admin-user"><i class="fa-solid fa-user-shield"></i> Admin</div>
+    </header>
+
+    <!-- Videos Tab -->
+    <section class="admin-tab" id="tab-videos">
+      <div class="tab-head">
+        <h3>All Videos</h3>
+        <button class="btn btn-primary" onclick="switchTab('add')"><i class="fa-solid fa-plus"></i> Add New</button>
+      </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Number</th>
+              <th>Thumbnail</th>
+              <th>Title (EN)</th>
+              <th>Title (SI)</th>
+              <th>Category</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="videosTableBody">
+            <tr><td colspan="8" class="center"><div class="loader"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Add/Edit Video Tab -->
+    <section class="admin-tab" id="tab-add" style="display:none;">
+      <div class="tab-head">
+        <h3 id="addTitle">Add New Video</h3>
+      </div>
+      <form id="videoForm" class="admin-form">
+        <input type="hidden" id="editVideoId">
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label><i class="fa-solid fa-heading"></i> Title (English) *</label>
+            <input type="text" id="vTitle" required>
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-heading"></i> Title (Sinhala) *</label>
+            <input type="text" id="vTitleSi" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-align-left"></i> Description (Sinhala) *</label>
+          <textarea id="vDescSi" rows="5" required placeholder="සිංහල විස්තරය මෙහි ඇතුළත් කරන්න..."></textarea>
+          <div class="auto-translate-box">
+            <button type="button" class="btn btn-sm btn-outline" id="autoTransBtn">
+              <i class="fa-solid fa-language"></i> Auto Translate to English
+            </button>
+            <span class="auto-trans-status" id="transStatus"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-align-left"></i> Description (English) *</label>
+          <textarea id="vDescEn" rows="5" required placeholder="English description (auto-filled or edit manually)"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label><i class="fa-solid fa-link"></i> Video Link (Telegram Bot) *</label>
+            <input type="url" id="vLink" required placeholder="https://t.me/...">
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-image"></i> Thumbnail (16:9 URL) *</label>
+            <input type="url" id="vThumb" required placeholder="https://...image.jpg">
+          </div>
+        </div>
+
+        <div class="thumb-preview" id="thumbPreview">
+          <img src="" alt="Preview" id="thumbImg">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label><i class="fa-solid fa-rectangle-ad"></i> Ad Link 1</label>
+            <input type="url" id="vAd1" placeholder="https://ad1.com">
+          </div>
+          <div class="form-group">
+            <label><i class="fa-solid fa-rectangle-ad"></i> Ad Link 2</label>
+            <input type="url" id="vAd2" placeholder="https://ad2.com">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-layer-group"></i> Category *</label>
+          <select id="vCategory" required></select>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Video</button>
+          <button type="button" class="btn btn-outline" id="resetFormBtn"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Categories Tab -->
+    <section class="admin-tab" id="tab-categories" style="display:none;">
+      <div class="tab-head">
+        <h3>Categories</h3>
+      </div>
+      <form id="catForm" class="admin-form inline-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category Name (English) *</label>
+            <input type="text" id="catName" required>
+          </div>
+          <div class="form-group">
+            <label>Category Name (Sinhala) *</label>
+            <input type="text" id="catNameSi" required>
+          </div>
+          <div class="form-group">
+            <label>&nbsp;</label>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Add Category</button>
+          </div>
+        </div>
+      </form>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name (EN)</th>
+              <th>Name (SI)</th>
+              <th>Slug</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="catsTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== NEW: INTRO VIDEO TAB ===== -->
+    <section class="admin-tab" id="tab-intro" style="display:none;">
+      <div class="tab-head">
+        <h3><i class="fa-solid fa-clapperboard" style="color:#ff4757"></i> Intro Video (Common for All Videos)</h3>
+      </div>
+      
+      <div class="intro-info-card">
+        <div class="intro-info-icon"><i class="fa-solid fa-circle-info"></i></div>
+        <div>
+          <h4>What is Intro Video?</h4>
+          <p>This video plays <strong>before every video</strong> on the site (after the ads). Use it for your channel intro, logo animation, or welcome message. Leave empty to disable.</p>
+        </div>
+      </div>
+
+      <form id="introForm" class="admin-form">
+        <div class="form-group">
+          <label><i class="fa-solid fa-link"></i> Intro Video Link *</label>
+          <input type="url" id="introLink" placeholder="https://example.com/intro.mp4 or YouTube embed">
+          <small style="color:#8a90a8;font-size:12px;margin-top:6px;display:block;">
+            <i class="fa-solid fa-lightbulb" style="color:#ff4757"></i> 
+            Use direct video URL (.mp4) or embed link (YouTube, etc.)
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-clock"></i> Intro Duration (seconds) *</label>
+          <input type="number" id="introDuration" min="3" max="120" value="15" placeholder="15">
+          <small style="color:#8a90a8;font-size:12px;margin-top:6px;display:block;">
+            <i class="fa-solid fa-lightbulb" style="color:#ff4757"></i> 
+            After this time, the main video will start automatically
+          </small>
+        </div>
+
+        <div class="form-group">
+          <label><i class="fa-solid fa-toggle-on"></i> Enable Intro Video</label>
+          <label class="switch-label">
+            <input type="checkbox" id="introEnabled" checked>
+            <span class="switch-text">Show intro before every video</span>
+          </label>
+        </div>
+
+        <div class="intro-preview" id="introPreview">
+          <h4><i class="fa-solid fa-eye"></i> Preview</h4>
+          <div class="intro-preview-frame">
+            <iframe id="introPreviewFrame" src="" allowfullscreen></iframe>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Intro Video</button>
+          <button type="button" class="btn btn-outline" id="clearIntroBtn"><i class="fa-solid fa-trash"></i> Clear Intro</button>
+        </div>
+      </form>
+
+      <div class="intro-flow-card">
+        <h4><i class="fa-solid fa-route"></i> How the Flow Works</h4>
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-num">1</div>
+            <div>User clicks <strong>Watch Now</strong></div>
+          </div>
+          <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="flow-step">
+            <div class="flow-num">2</div>
+            <div>Ad 1 opens</div>
+          </div>
+          <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="flow-step">
+            <div class="flow-num">3</div>
+            <div>Ad 2 opens</div>
+          </div>
+          <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="flow-step active">
+            <div class="flow-num">4</div>
+            <div><strong>Intro Video</strong> plays</div>
+          </div>
+          <div class="flow-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+          <div class="flow-step">
+            <div class="flow-num">5</div>
+            <div>Main video plays</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings Tab -->
+    <section class="admin-tab" id="tab-settings" style="display:none;">
+      <div class="tab-head"><h3>Settings</h3></div>
+      <form id="settingsForm" class="admin-form">
+        <div class="form-group">
+          <label><i class="fa-solid fa-user"></i> Admin Username</label>
+          <input type="text" id="setUser" value="admin">
+        </div>
+        <div class="form-group">
+          <label><i class="fa-solid fa-lock"></i> Admin Password</label>
+          <input type="password" id="setPass" value="admin123">
+        </div>
+        <button type="submit" class="btn btn-primary"><i class="fa-solid fa-save"></i> Save Settings</button>
+      </form>
+    </section>
+  </main>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<style>
+/* Intro tab specific styles */
+.intro-info-card {
+  background: linear-gradient(135deg, rgba(255,71,87,0.1), rgba(108,92,231,0.1));
+  border: 1px solid rgba(255,71,87,0.3);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+.intro-info-icon {
+  width: 48px; height: 48px;
+  background: linear-gradient(135deg, #ff4757, #ff6b9d);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: #fff; flex-shrink: 0;
+}
+.intro-info-card h4 { margin-bottom: 6px; color: #fff; }
+.intro-info-card p { color: #a0a6bd; font-size: 14px; line-height: 1.6; margin: 0; }
+
+.intro-preview {
+  background: #0a0e1a;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 20px 0;
+  display: none;
+}
+.intro-preview.show { display: block; }
+.intro-preview h4 {
+  margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+  color: #a0a6bd; font-size: 14px;
+}
+.intro-preview h4 i { color: #ff4757; }
+.intro-preview-frame {
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.intro-preview-frame iframe {
+  width: 100%; height: 100%; border: none;
+}
+
+.switch-label {
+  display: flex; align-items: center; gap: 12px;
+  cursor: pointer;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.switch-label input[type="checkbox"] {
+  width: 20px; height: 20px;
+  accent-color: #ff4757;
+  cursor: pointer;
+}
+.switch-text { font-size: 14px; color: #c0c5d8; }
+
+.intro-flow-card {
+  background: linear-gradient(135deg, #141929, #1a1f35);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 24px;
+  margin-top: 20px;
+}
+.intro-flow-card h4 {
+  margin-bottom: 20px;
+  display: flex; align-items: center; gap: 10px;
+  color: #fff;
+}
+.intro-flow-card h4 i { color: #ff4757; }
+.flow-steps {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.flow-step {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 14px 18px;
+  text-align: center;
+  min-width: 120px;
+  transition: all 0.3s;
+}
+.flow-step.active {
+  background: linear-gradient(135deg, rgba(255,71,87,0.2), rgba(255,107,157,0.2));
+  border-color: #ff4757;
+}
+.flow-num {
+  width: 32px; height: 32px;
+  margin: 0 auto 8px;
+  background: linear-gradient(135deg, #ff4757, #ff6b9d);
+  color: #fff;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+.flow-step div:last-child {
+  font-size: 13px;
+  color: #c0c5d8;
+}
+.flow-arrow {
+  color: #ff4757;
+  font-size: 18px;
+}
+
+@media (max-width: 768px) {
+  .flow-steps { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+  .flow-step { width: 100%; }
+}
+</style>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/translate.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

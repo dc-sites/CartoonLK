@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Watch Later - CartoonLK</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-info"><span><i class="fa-solid fa-tv"></i> <span data-i18n="topbar_new">New episodes daily</span></span></div>
+    <div class="topbar-actions">
+      <button id="langToggle" class="lang-btn"><i class="fa-solid fa-language"></i> <span id="langLabel">සිංහල</span></button>
+    </div>
+  </div>
+</div>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo"><i class="fa-solid fa-clapperboard"></i><span>Cartoon<span class="accent">LK</span></span></a>
+    <nav class="nav-menu" id="navMenu">
+      <ul class="nav-list">
+        <li><a href="index.html"><i class="fa-solid fa-house"></i> <span data-i18n="nav_home">Home</span></a></li>
+        <li><a href="watchlater.html" class="active"><i class="fa-solid fa-bookmark"></i> <span data-i18n="nav_watchlater">Watch Later</span></a></li>
+      </ul>
+    </nav>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="container section">
+  <div class="section-head">
+    <h2><i class="fa-solid fa-bookmark"></i> <span data-i18n="wl_title">My Watch Later</span></h2>
+    <button class="btn btn-outline" id="clearAllBtn"><i class="fa-solid fa-trash"></i> <span data-i18n="wl_clear">Clear All</span></button>
+  </div>
+  <div class="video-grid" id="wlGrid">
+    <div class="loader-wrap"><div class="loader"></div></div>
+  </div>
+  <div id="wlEmpty" class="empty-state" style="display:none;">
+    <i class="fa-regular fa-bookmark"></i>
+    <h3 data-i18n="wl_empty_title">Your Watch Later list is empty</h3>
+    <p data-i18n="wl_empty_desc">Save videos to watch them later!</p>
+    <a href="index.html" class="btn btn-primary"><i class="fa-solid fa-house"></i> <span data-i18n="wl_browse">Browse Videos</span></a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-bottom"><p>&copy; 2026 CartoonLK. <span data-i18n="footer_rights">All Rights Reserved.</span></p></div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/translate.js"></script>
+<script>
+const currentLang = localStorage.getItem('clk_lang') || 'en';
+const grid = document.getElementById('wlGrid');
+const empty = document.getElementById('wlEmpty');
+
+async function loadWatchLater() {
+  const ids = JSON.parse(localStorage.getItem('clk_watchlater') || '[]');
+  if (!ids.length) {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  const videos = [];
+  for (const id of ids) {
+    try {
+      const doc = await db.collection('videos').doc(id).get();
+      if (doc.exists) videos.push({ id: doc.id, ...doc.data() });
+    } catch(e) {}
+  }
+  if (!videos.length) {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+  grid.innerHTML = videos.map(v => {
+    const title = currentLang === 'si' ? v.titleSi : v.title;
+    return `
+      <div class="video-card">
+        <a href="watch.html?id=${v.id}">
+          <div class="thumb"><img src="${v.thumbnail || 'https://via.placeholder.com/320x180'}" alt="${title}" loading="lazy"></div>
+          <div class="card-body">
+            <h3>${title}</h3>
+            <p class="card-meta"><i class="fa-solid fa-calendar"></i> ${v.createdAt ? new Date(v.createdAt).toLocaleDateString() : ''}</p>
+          </div>
+        </a>
+        <button class="remove-btn" data-id="${v.id}" title="Remove"><i class="fa-solid fa-xmark"></i></button>
+      </div>`;
+  }).join('');
+  
+  document.querySelectorAll('.remove-btn').forEach(b => {
+    b.addEventListener('click', (e) => {
+      e.preventDefault();
+      const id = b.dataset.id;
+      let wl = JSON.parse(localStorage.getItem('clk_watchlater') || '[]');
+      wl = wl.filter(x => x !== id);
+      localStorage.setItem('clk_watchlater', JSON.stringify(wl));
+      loadWatchLater();
+    });
+  });
+}
+
+document.getElementById('clearAllBtn').addEventListener('click', () => {
+  if (confirm(currentLang === 'si' ? 'ඔබට විශ්වාසද?' : 'Are you sure?')) {
+    localStorage.removeItem('clk_watchlater');
+    loadWatchLater();
+  }
+});
+
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('navMenu').classList.toggle('open');
+});
+document.getElementById('langToggle').addEventListener('click', () => {
+  const cur = localStorage.getItem('clk_lang') || 'en';
+  localStorage.setItem('clk_lang', cur === 'en' ? 'si' : 'en');
+  location.reload();
+});
+
+loadWatchLater();
+</script>
+</body>
+</html>

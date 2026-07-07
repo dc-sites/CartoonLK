@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Category - CartoonLK</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-info"><span><i class="fa-solid fa-tv"></i> <span data-i18n="topbar_new">New episodes daily</span></span></div>
+    <div class="topbar-actions">
+      <button id="langToggle" class="lang-btn"><i class="fa-solid fa-language"></i> <span id="langLabel">සිංහල</span></button>
+    </div>
+  </div>
+</div>
+
+<header class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo"><i class="fa-solid fa-clapperboard"></i><span>Cartoon<span class="accent">LK</span></span></a>
+    <nav class="nav-menu" id="navMenu">
+      <ul class="nav-list">
+        <li><a href="index.html"><i class="fa-solid fa-house"></i> <span data-i18n="nav_home">Home</span></a></li>
+        <li><a href="watchlater.html"><i class="fa-solid fa-bookmark"></i> <span data-i18n="nav_watchlater">Watch Later</span></a></li>
+      </ul>
+    </nav>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<section class="container section">
+  <div class="section-head">
+    <h2><i class="fa-solid fa-folder"></i> <span id="catTitle">Category</span></h2>
+  </div>
+  <div class="video-grid" id="catGrid">
+    <div class="loader-wrap"><div class="loader"></div></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-bottom"><p>&copy; 2026 CartoonLK. <span data-i18n="footer_rights">All Rights Reserved.</span></p></div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/translate.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const catSlug = params.get('cat');
+const currentLang = localStorage.getItem('clk_lang') || 'en';
+
+async function loadCategory() {
+  if (!catSlug) return;
+  
+  // Get category info
+  const catSnap = await db.collection('categories').where('slug', '==', catSlug).get();
+  if (catSnap.empty) {
+    document.getElementById('catTitle').textContent = 'Category not found';
+    return;
+  }
+  const cat = catSnap.docs[0].data();
+  document.getElementById('catTitle').textContent = currentLang === 'si' ? cat.nameSi : cat.name;
+  document.title = document.getElementById('catTitle').textContent + ' - CartoonLK';
+  
+  // ✅ FIXED: Get all videos in category WITHOUT orderBy (no index needed)
+  // Then sort client-side
+  const vidSnap = await db.collection('videos').where('categorySlug', '==', catSlug).get();
+  const grid = document.getElementById('catGrid');
+  
+  if (vidSnap.empty) {
+    grid.innerHTML = '<div class="empty-state"><i class="fa-solid fa-film"></i><h3>No videos yet</h3></div>';
+    return;
+  }
+  
+  // Sort by createdAt descending on client side
+  const videos = vidSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  videos.sort((a, b) => {
+    const ta = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : new Date(a.createdAt).getTime()) : 0;
+    const tb = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : new Date(b.createdAt).getTime()) : 0;
+    return tb - ta; // newest first
+  });
+  
+  grid.innerHTML = videos.map(v => {
+    const title = currentLang === 'si' ? v.titleSi : v.title;
+    const date = v.createdAt ? (v.createdAt.toDate ? v.createdAt.toDate() : new Date(v.createdAt)) : null;
+    return `
+      <a href="watch.html?id=${v.id}" class="video-card">
+        <div class="thumb"><img src="${v.thumbnail || 'https://via.placeholder.com/320x180'}" alt="${title}" loading="lazy"></div>
+        <div class="card-body">
+          <h3>${title}</h3>
+          <p class="card-meta"><i class="fa-solid fa-calendar"></i> ${date ? date.toLocaleDateString() : ''}</p>
+        </div>
+      </a>`;
+  }).join('');
+}
+
+document.getElementById('hamburger').addEventListener('click', () => {
+  document.getElementById('navMenu').classList.toggle('open');
+});
+document.getElementById('langToggle').addEventListener('click', () => {
+  const cur = localStorage.getItem('clk_lang') || 'en';
+  localStorage.setItem('clk_lang', cur === 'en' ? 'si' : 'en');
+  location.reload();
+});
+
+loadCategory();
+</script>
+</body>
+</html>

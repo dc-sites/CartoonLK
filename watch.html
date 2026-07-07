@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Watch - CartoonLK</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Noto+Sans+Sinhala:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* ===== VIDEO WRAPPER ===== */
+.video-wrapper {
+  position: relative;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 16px;
+  overflow: hidden;
+}
+.video-wrapper iframe {
+  width: 100%; height: 100%; border: none;
+}
+
+/* ===== WATCH NOW BUTTON (BELOW VIDEO) ===== */
+.watch-now-section {
+  margin-top: 20px;
+  text-align: center;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(255,71,87,0.1), rgba(108,92,231,0.1));
+  border: 2px solid rgba(255,71,87,0.3);
+  border-radius: 16px;
+}
+.watch-now-section .intro-label {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(255,71,87,0.2);
+  color: #ff6b7a;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+.watch-now-section .intro-label i {
+  animation: pulse2 1.5s infinite;
+}
+@keyframes pulse2 {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.watch-now-btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  padding: 18px 50px;
+  background: linear-gradient(135deg, #ff4757, #ff6b9d);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 800;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(255,71,87,0.5);
+  transition: all 0.3s;
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  animation: watchPulse 2s infinite;
+}
+@keyframes watchPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(255,71,87,0.5); }
+  50% { transform: scale(1.05); box-shadow: 0 15px 40px rgba(255,71,87,0.8); }
+}
+.watch-now-btn:hover {
+  transform: scale(1.08) !important;
+  box-shadow: 0 15px 50px rgba(255,71,87,0.9) !important;
+}
+.watch-now-btn i { font-size: 22px; }
+.click-counter {
+  margin-top: 14px;
+  font-size: 13px;
+  color: #a0a6bd;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.click-counter i { color: #ff4757; }
+.click-counter strong {
+  color: #ff6b7a;
+  font-size: 16px;
+}
+
+/* ===== NO INTRO MESSAGE ===== */
+.no-intro-msg {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #0a0e1a, #141929);
+  color: #8a90a8;
+}
+.no-intro-msg i { font-size: 50px; color: #ff4757; }
+</style>
+</head>
+<body class="watch-page">
+
+<!-- Topbar -->
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-info">
+      <span><i class="fa-solid fa-tv"></i> <span data-i18n="topbar_new">New episodes daily</span></span>
+    </div>
+    <div class="topbar-actions">
+      <button id="langToggle" class="lang-btn"><i class="fa-solid fa-language"></i> <span id="langLabel">සිංහල</span></button>
+    </div>
+  </div>
+</div>
+
+<!-- Navbar -->
+<header class="navbar">
+  <div class="container nav-inner">
+    <a href="index.html" class="logo"><i class="fa-solid fa-clapperboard"></i><span>Cartoon<span class="accent">LK</span></span></a>
+    <nav class="nav-menu" id="navMenu">
+      <ul class="nav-list">
+        <li><a href="index.html"><i class="fa-solid fa-house"></i> <span data-i18n="nav_home">Home</span></a></li>
+        <li><a href="watchlater.html"><i class="fa-solid fa-bookmark"></i> <span data-i18n="nav_watchlater">Watch Later</span></a></li>
+      </ul>
+    </nav>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</header>
+
+<!-- Watch Content -->
+<main class="container watch-container">
+  <div class="watch-main">
+    
+    <!-- VIDEO AREA: Only shows intro video (looping) -->
+    <div class="video-wrapper" id="videoWrapper">
+      <iframe id="introFrame" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <div class="no-intro-msg" id="noIntroMsg" style="display:none;">
+        <i class="fa-solid fa-clapperboard"></i>
+        <p>Intro video not set</p>
+      </div>
+    </div>
+
+    <!-- WATCH NOW BUTTON (BELOW VIDEO) -->
+    <div class="watch-now-section">
+      <div class="intro-label">
+        <i class="fa-solid fa-circle-play"></i>
+        <span id="introLabelText">Intro Playing</span>
+      </div>
+      <br>
+      <button class="watch-now-btn" id="watchNowBtn">
+        <i class="fa-solid fa-play"></i>
+        <span id="watchNowText">WATCH NOW</span>
+      </button>
+      <div class="click-counter">
+        <i class="fa-solid fa-hand-pointer"></i>
+        <span id="counterText">Click <strong id="clickCount">1</strong> of 3 to watch the video</span>
+      </div>
+    </div>
+
+    <!-- Video Info -->
+    <div class="video-info">
+      <h1 id="videoTitle">Loading...</h1>
+      <div class="video-meta">
+        <span><i class="fa-solid fa-calendar"></i> <span id="videoDate">-</span></span>
+        <span><i class="fa-solid fa-folder"></i> <span id="videoCategory">-</span></span>
+        <button class="btn-icon" id="watchLaterBtn"><i class="fa-regular fa-bookmark"></i> <span>Watch Later</span></button>
+        <button class="btn-icon" id="shareBtn"><i class="fa-solid fa-share-nodes"></i> <span>Share</span></button>
+      </div>
+      <div class="video-desc" id="videoDesc"></div>
+    </div>
+
+    <!-- Related -->
+    <div class="related-section">
+      <h3><i class="fa-solid fa-film"></i> Related Videos</h3>
+      <div class="video-grid small" id="relatedGrid"></div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="watch-sidebar">
+    <h3><i class="fa-solid fa-list"></i> More Videos</h3>
+    <div id="sidebarVideos"></div>
+  </aside>
+</main>
+
+<footer class="footer">
+  <div class="footer-bottom">
+    <p>&copy; 2026 CartoonLK. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<button id="toTop" class="to-top"><i class="fa-solid fa-arrow-up"></i></button>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase.js"></script>
+<script src="js/translate.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  const params = new URLSearchParams(location.search);
+  const videoId = params.get('id');
+  const currentLang = localStorage.getItem('clk_lang') || 'en';
+  const isSi = currentLang === 'si';
+
+  let currentVideo = null;
+  let introVideoUrl = '';
+  let clickCount = 0;
+  let linksToOpen = []; // [ad1, ad2, botLink]
+
+  /* ============================
+     LOAD VIDEO + INTRO
+     ============================ */
+  async function loadVideo() {
+    if (!videoId) {
+      document.getElementById('videoTitle').textContent = isSi ? 'වීඩියෝව හමු නොවීය' : 'Video not found';
+      return;
+    }
+    try {
+      const doc = await db.collection('videos').doc(videoId).get();
+      if (!doc.exists) {
+        document.getElementById('videoTitle').textContent = isSi ? 'වීඩියෝව හමු නොවීය' : 'Video not found';
+        return;
+      }
+      currentVideo = { id: doc.id, ...doc.data() };
+      renderVideoInfo();
+
+      // Load intro video
+      try {
+        const introDoc = await db.collection('config').doc('intro').get();
+        if (introDoc.exists && introDoc.data().enabled && introDoc.data().videoLink) {
+          introVideoUrl = introDoc.data().videoLink.trim();
+        }
+      } catch (e) { console.log('No intro set'); }
+
+      // Setup intro iframe (looping forever)
+      setupIntro();
+
+      // Build links queue: [ad1, ad2, botLink]
+      buildLinksQueue();
+
+      // Update button text
+      updateButtonText();
+
+      loadRelated();
+    } catch (e) {
+      console.error('Load error:', e);
+      document.getElementById('videoTitle').textContent = 'Error loading video';
+    }
+  }
+
+  /* ============================
+     RENDER VIDEO INFO
+     ============================ */
+  function renderVideoInfo() {
+    const v = currentVideo;
+    const title = isSi ? v.titleSi : v.title;
+    document.title = title + ' - CartoonLK';
+    document.getElementById('videoTitle').textContent = title;
+    document.getElementById('videoDesc').textContent = isSi ? (v.descriptionSi || '') : (v.descriptionEn || '');
+
+    const date = v.createdAt ? (v.createdAt.toDate ? v.createdAt.toDate() : new Date(v.createdAt)) : null;
+    document.getElementById('videoDate').textContent = date ? date.toLocaleDateString() : '-';
+    document.getElementById('videoCategory').textContent = v.categoryName || '-';
+
+    // Watch later
+    const wl = JSON.parse(localStorage.getItem('clk_watchlater') || '[]');
+    const btn = document.getElementById('watchLaterBtn');
+    if (wl.includes(v.id)) {
+      btn.classList.add('active');
+      btn.innerHTML = '<i class="fa-solid fa-bookmark"></i> <span>' + (isSi ? 'සුරකින ලදී' : 'Saved') + '</span>';
+    }
+  }
+
+  /* ============================
+     SETUP INTRO VIDEO (LOOPING FOREVER)
+     ============================ */
+  function setupIntro() {
+    const frame = document.getElementById('introFrame');
+    const noIntro = document.getElementById('noIntroMsg');
+    const labelText = document.getElementById('introLabelText');
+
+    if (introVideoUrl) {
+      // For YouTube embeds, add autoplay, loop, mute parameters
+      let url = introVideoUrl;
+      if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        const separator = url.includes('?') ? '&' : '?';
+        url = url + separator + 'autoplay=1&loop=1&mute=1&playlist=VIDEO_ID';
+        // Extract video ID for playlist param (needed for loop to work)
+        const match = url.match(/(?:embed\/|v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+        if (match) {
+          url = url.replace('playlist=VIDEO_ID', 'playlist=' + match[1]);
+        }
+      }
+      frame.src = url;
+      frame.style.display = 'block';
+      noIntro.style.display = 'none';
+      labelText.textContent = isSi ? 'හැඳින්වීම ධාවනය වේ' : 'Intro Playing';
+    } else {
+      // No intro set
+      frame.style.display = 'none';
+      noIntro.style.display = 'flex';
+      labelText.textContent = isSi ? 'හැඳින්වීමක් නැත' : 'No Intro Set';
+    }
+  }
+
+  /* ============================
+     BUILD LINKS QUEUE
+     Order: Ad1 → Ad2 → Bot Link
+     ============================ */
+  function buildLinksQueue() {
+    linksToOpen = [];
+    
+    // 1st click: Ad Link 1
+    if (currentVideo.adLink1 && currentVideo.adLink1.trim()) {
+      linksToOpen.push(currentVideo.adLink1.trim());
+    }
+    
+    // 2nd click: Ad Link 2
+    if (currentVideo.adLink2 && currentVideo.adLink2.trim()) {
+      linksToOpen.push(currentVideo.adLink2.trim());
+    }
+    
+    // 3rd click (final): Telegram bot link
+    if (currentVideo.videoLink && currentVideo.videoLink.trim()) {
+      linksToOpen.push(currentVideo.videoLink.trim());
+    }
+  }
+
+  /* ============================
+     UPDATE BUTTON TEXT
+     ============================ */
+  function updateButtonText() {
+    const btn = document.getElementById('watchNowBtn');
+    const btnText = document.getElementById('watchNowText');
+    const counter = document.getElementById('clickCount');
+    const counterText = document.getElementById('counterText');
+    const total = linksToOpen.length;
+    const remaining = total - clickCount;
+
+    if (remaining <= 0) {
+      // All done - video already opened
+      btnText.textContent = isSi ? 'වීඩියෝව විවෘත විය ✓' : 'VIDEO OPENED ✓';
+      btn.disabled = true;
+      btn.style.opacity = '0.6';
+      btn.style.cursor = 'not-allowed';
+      btn.style.animation = 'none';
+      counterText.innerHTML = isSi 
+        ? 'වීඩියෝව දැන් ටැබ් එකක විවෘත වී ඇත' 
+        : 'Video is now open in a new tab';
+      return;
+    }
+
+    // Show remaining clicks
+    counter.textContent = (clickCount + 1);
+    
+    if (isSi) {
+      counterText.innerHTML = 'වීඩියෝව නැරඹීමට <strong>' + (clickCount + 1) + '</strong> / 3 වතාවක් ක්ලික් කරන්න';
+      if (remaining === 1) {
+        btnText.textContent = 'වීඩියෝව නරඹන්න';
+      } else {
+        btnText.textContent = 'දැන්ම නරඹන්න';
+      }
+    } else {
+      counterText.innerHTML = 'Click <strong>' + (clickCount + 1) + '</strong> of 3 to watch the video';
+      if (remaining === 1) {
+        btnText.textContent = 'WATCH VIDEO';
+      } else {
+        btnText.textContent = 'WATCH NOW';
+      }
+    }
+  }
+
+  /* ============================
+     WATCH NOW BUTTON CLICK
+     ============================ */
+  document.getElementById('watchNowBtn').addEventListener('click', function() {
+    if (this.disabled) return;
+    if (clickCount >= linksToOpen.length) return;
+
+    // Get the link to open
+    const url = linksToOpen[clickCount];
+    
+    // Open in new tab
+    window.open(url, '_blank');
+    
+    // Increment counter
+    clickCount++;
+    
+    // Update button text
+    updateButtonText();
+  });
+
+  /* ============================
+     WATCH LATER
+     ============================ */
+  document.getElementById('watchLaterBtn').addEventListener('click', function() {
+    if (!currentVideo) return;
+    var wl = JSON.parse(localStorage.getItem('clk_watchlater') || '[]');
+    var idx = wl.indexOf(currentVideo.id);
+    if (idx > -1) {
+      wl.splice(idx, 1);
+      this.classList.remove('active');
+      this.innerHTML = '<i class="fa-regular fa-bookmark"></i> <span>' + (isSi ? 'පසුව නරඹන්න' : 'Watch Later') + '</span>';
+    } else {
+      wl.push(currentVideo.id);
+      this.classList.add('active');
+      this.innerHTML = '<i class="fa-solid fa-bookmark"></i> <span>' + (isSi ? 'සුරකින ලදී' : 'Saved') + '</span>';
+    }
+    localStorage.setItem('clk_watchlater', JSON.stringify(wl));
+  });
+
+  /* ============================
+     SHARE
+     ============================ */
+  document.getElementById('shareBtn').addEventListener('click', function() {
+    var url = location.href;
+    if (navigator.share) {
+      navigator.share({ title: document.title, url: url }).catch(function() {});
+    } else {
+      navigator.clipboard.writeText(url);
+      alert(isSi ? 'සබැඳිය පිටපත් විය!' : 'Link copied!');
+    }
+  });
+
+  /* ============================
+     LOAD RELATED VIDEOS
+     ============================ */
+  async function loadRelated() {
+    try {
+      var snap = await db.collection('videos').get();
+      var videos = [];
+      snap.forEach(function(d) {
+        if (d.id !== videoId) videos.push({ id: d.id, ...d.data() });
+      });
+      videos.sort(function(a, b) {
+        var ta = a.createdAt && a.createdAt.toMillis ? a.createdAt.toMillis() : 0;
+        var tb = b.createdAt && b.createdAt.toMillis ? b.createdAt.toMillis() : 0;
+        return tb - ta;
+      });
+      videos = videos.slice(0, 8);
+      renderRelated(videos);
+    } catch (e) { console.error(e); }
+  }
+
+  function renderRelated(videos) {
+    var grid = document.getElementById('relatedGrid');
+    var sidebar = document.getElementById('sidebarVideos');
+    if (!videos.length) {
+      grid.innerHTML = '<p style="color:#8a90a8;">No related videos</p>';
+      sidebar.innerHTML = '';
+      return;
+    }
+    grid.innerHTML = videos.map(function(v) {
+      var t = isSi ? v.titleSi : v.title;
+      var d = v.createdAt && v.createdAt.toDate ? v.createdAt.toDate().toLocaleDateString() : '';
+      return '<a href="watch.html?id=' + v.id + '" class="video-card"><div class="thumb"><img src="' + (v.thumbnail || 'https://via.placeholder.com/320x180') + '" alt="' + t + '" loading="lazy"></div><div class="card-body"><h3>' + t + '</h3><p class="card-meta"><i class="fa-solid fa-calendar"></i> ' + d + '</p></div></a>';
+    }).join('');
+
+    sidebar.innerHTML = videos.map(function(v) {
+      var t = isSi ? v.titleSi : v.title;
+      var d = v.createdAt && v.createdAt.toDate ? v.createdAt.toDate().toLocaleDateString() : '';
+      return '<a href="watch.html?id=' + v.id + '" class="sidebar-card"><img src="' + (v.thumbnail || 'https://via.placeholder.com/160x90') + '" alt="' + t + '" loading="lazy"><div><h4>' + t + '</h4><p><i class="fa-solid fa-calendar"></i> ' + d + '</p></div></a>';
+    }).join('');
+  }
+
+  /* ============================
+     HAMBURGER
+     ============================ */
+  document.getElementById('hamburger').addEventListener('click', function() {
+    this.classList.toggle('open');
+    document.getElementById('navMenu').classList.toggle('open');
+  });
+
+  /* ============================
+     LANGUAGE TOGGLE
+     ============================ */
+  document.getElementById('langToggle').addEventListener('click', function() {
+    var cur = localStorage.getItem('clk_lang') || 'en';
+    localStorage.setItem('clk_lang', cur === 'en' ? 'si' : 'en');
+    location.reload();
+  });
+
+  /* ============================
+     BACK TO TOP
+     ============================ */
+  var toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 400) toTop.classList.add('show');
+    else toTop.classList.remove('show');
+  });
+  toTop.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  /* ============================
+     START
+     ============================ */
+  loadVideo();
+
+})();
+</script>
+</body>
+</html>
